@@ -1,43 +1,39 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
-from prim import R3Cycle
+from dijkstra import dijkstra
+from prim import rota_dfs_mst, calcular_custo_rota
+from graphs import cidade1, cidade2, cidade3
 
 app = Flask(__name__)
 CORS(app)
 
-# Definindo os pontos de coleta
-pontos_coleta = {
-    'Central': (0, 0),
-    'Praça Verde': (1, 2),
-    'Escola Sustentável': (3, 1),
-    'Shopping Reciclável': (-2, 3),
-    'Parque Ecológico': (4, -1),
-    'Condomínio Solar': (-3, -2),
-    'Feira Orgânica': (2, -3),
-    'Universidade Verde': (5, 2),
-    'Hospital Limpo': (-4, 1),
-    'Estação de Trem': (1, 4),
-    'Mercado Sustentável': (-1, -4),
-    'Biblioteca Ecológica': (3, 5),
-    'Prefeitura Verde': (-5, 0),
-    'Praça da Reciclagem': (0, 5),
-    'Terminal de Ônibus': (-2, -3),
-    'Centro Comunitário': (4, 4),
-    'Lago Artificial': (-3, 4),
-    'Aeroporto Sustentável': (6, 0),
-    'Zoológico Ecológico': (-6, -1),
-    'Ponto de Coleta Norte': (2, 6),
-    'Ponto de Coleta Sul': (1, -5)
-}
-
 @app.route("/")
 def test():
-    r3cycle = R3Cycle(pontos_coleta)
-    rota_otimizada = r3cycle.encontrar_rota_otimizada('Central')
-    distancia_total = r3cycle.calcular_distancia_total(rota_otimizada)
+    cidade = cidade1
+
+    # Função de Prim ( Sair da Central )
+    inicio = 'Central de Transportes'
+    rota_prim = rota_dfs_mst(cidade, inicio)
+    custo_prim = calcular_custo_rota(cidade, rota_prim)
+    print(f"Prim - Rota gerada pela árvore geradora mínima: {rota_prim}")
+    print(f"Custo da rota Prim: {custo_prim}\n")
+    ultimo_ponto_prim = rota_prim[-1]  # O último ponto na sequência gerada por DFS
+
+    # Função de Dijkstra ( Retornar à Central )
+    origem = ultimo_ponto_prim
+    destino = inicio
+    menor_caminho, custo_dijkstra = dijkstra(cidade, origem, destino)
+    print(f"Dijkstra - Menor caminho de {origem} a {destino}: {menor_caminho} com custo {custo_dijkstra}")
+
     return jsonify({
-        "rota_otimizada": rota_otimizada,
-        "distancia_total": distancia_total
+        "prim": {
+            "rota": rota_prim,
+            "custo": custo_prim
+        },
+        "dijkstra": {
+            "menor_caminho": menor_caminho,
+            "custo": custo_dijkstra
+        }
     })
 
 if __name__ == "__main__":
