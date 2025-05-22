@@ -2,12 +2,11 @@
 from flask import Flask
 from flask_cors import CORS
 from dotenv import load_dotenv
+load_dotenv()
 from config import Config
 from models import db
 from routes_crud import routes  # Blueprint CRUD
 from routes_rota import rota_routes
-
-load_dotenv()
 
 app = Flask(__name__)
 app.config.from_object(Config)
