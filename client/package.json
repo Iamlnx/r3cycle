@@ -10,10 +10,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.1.7",
     "axios": "^1.9.0",
+    "cytoscape": "^3.32.0",
     "react": "^19.1.0",
+    "react-cytoscapejs": "^2.0.0",
     "react-dom": "^19.1.0",
-    "react-router-dom": "^7.6.0"
+    "react-graph-vis": "^1.0.7",
+    "react-router-dom": "^7.6.0",
+    "reactflow": "^11.11.4",
+    "tailwindcss": "^4.1.7",
+    "vis-network": "^9.1.10"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
