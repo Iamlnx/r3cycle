@@ -7,6 +7,7 @@ from config import Config
 from models import db
 from routes_crud import routes  # Blueprint CRUD
 from routes_rota import rota_routes
+from routes_grafo import grafo_routes
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -14,6 +15,7 @@ db.init_app(app)
 CORS(app)
 app.register_blueprint(routes)
 app.register_blueprint(rota_routes)  
+app.register_blueprint(grafo_routes)
 
 if __name__ == "__main__":
     with app.app_context():
