@@ -1,40 +1,39 @@
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from dotenv import load_dotenv
+load_dotenv()
+from config import Config
+from models import db
+from graphs import gerar_grafo_por_cidade
 from dijkstra import dijkstra
 from prim import rota_dfs_mst, calcular_custo_rota
-from graphs import cidade1, cidade2, cidade3
+
 
 app = Flask(__name__)
+app.config.from_object(Config)
 CORS(app)
-
-# Mapeia nomes para os grafos
-cidades = {
-    "cidade1": cidade1,
-    "cidade2": cidade2,
-    "cidade3": cidade3
-}
+db.init_app(app)
 
 @app.route("/rota", methods=["POST"])
 def calcular_rota():
     data = request.get_json()
-    nome_cidade = data.get("cidade")
+    id_cidade = data.get("id_cidade")  # Agora recebendo o ID da cidade
 
-    if nome_cidade not in cidades:
-        return jsonify({"erro": "Cidade inválida"}), 400
+    if not id_cidade:
+        return jsonify({"erro": "ID da cidade não fornecido"}), 400
 
-    cidade = cidades[nome_cidade]
+    grafo = gerar_grafo_por_cidade(id_cidade)
     inicio = 'Central de Transportes'
 
-    # Prim (Ida)
-    rota_prim = rota_dfs_mst(cidade, inicio)
-    custo_prim = calcular_custo_rota(cidade, rota_prim)
+    if inicio not in grafo:
+        return jsonify({"erro": f"Ponto inicial '{inicio}' não encontrado na cidade"}), 400
+
+    rota_prim = rota_dfs_mst(grafo, inicio)
+    custo_prim = calcular_custo_rota(grafo, rota_prim)
     ultimo_ponto_prim = rota_prim[-1]
 
-    # Dijkstra (Volta)
-    origem = ultimo_ponto_prim
-    destino = inicio
-    menor_caminho, custo_dijkstra = dijkstra(cidade, origem, destino)
+    menor_caminho, custo_dijkstra = dijkstra(grafo, ultimo_ponto_prim, inicio)
 
     return jsonify({
         "prim": {
@@ -48,5 +47,8 @@ def calcular_rota():
     })
 
 if __name__ == "__main__":
-    app.run()
+    with app.app_context():
+        db.create_all()
+    app.run(debug=True)
+
 
