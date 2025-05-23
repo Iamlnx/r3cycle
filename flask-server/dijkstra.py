@@ -31,3 +31,4 @@ def dijkstra(grafo, origem, destino):
     caminho.reverse()
     
     return caminho, distancias[destino]
+

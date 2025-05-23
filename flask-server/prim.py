@@ -37,3 +37,4 @@ def calcular_custo_rota(grafo, rota):
         destino = rota[i + 1]
         custo_total += grafo[origem].get(destino, 0)
     return custo_total
+
