@@ -80,7 +80,6 @@ def get_usuarios():
         'id_usuario': u.id_usuario,
         'nome': u.nome,
         'email': u.email,
-        'id_cidade': u.id_cidade,
         'tipo_usuario': u.tipo_usuario
     } for u in usuarios])
 
@@ -91,7 +90,6 @@ def get_usuario(id_usuario):
         'id_usuario': u.id_usuario,
         'nome': u.nome,
         'email': u.email,
-        'id_cidade': u.id_cidade,
         'tipo_usuario': u.tipo_usuario
     })
 
@@ -102,7 +100,6 @@ def create_usuario():
         nome=data['nome'],
         email=data['email'],
         senha=data['senha'],
-        id_cidade=data.get('id_cidade'),
         tipo_usuario=data.get('tipo_usuario')
     )
     db.session.add(u)
@@ -111,7 +108,6 @@ def create_usuario():
         'id_usuario': u.id_usuario,
         'nome': u.nome,
         'email': u.email,
-        'id_cidade': u.id_cidade,
         'tipo_usuario': u.tipo_usuario
     }), 201
 
@@ -122,14 +118,12 @@ def update_usuario(id_usuario):
     u.nome = data.get('nome', u.nome)
     u.email = data.get('email', u.email)
     u.senha = data.get('senha', u.senha)
-    u.id_cidade = data.get('id_cidade', u.id_cidade)
     u.tipo_usuario = data.get('tipo_usuario', u.tipo_usuario)
     db.session.commit()
     return jsonify({
         'id_usuario': u.id_usuario,
         'nome': u.nome,
         'email': u.email,
-        'id_cidade': u.id_cidade,
         'tipo_usuario': u.tipo_usuario
     })
 

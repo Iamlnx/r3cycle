@@ -26,14 +26,12 @@ class Usuario(db.Model):
     nome = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     senha = db.Column(db.String(255), nullable=False)
-    id_cidade = db.Column(db.Integer, db.ForeignKey('cidade.id_cidade'), nullable=True)
     tipo_usuario = db.Column(db.String(255), nullable=True)
 
     def __init__(self, nome, email, senha, id_cidade=None, tipo_usuario=None):
         self.nome = nome
         self.email = email
         self.senha = senha
-        self.id_cidade = id_cidade
         self.tipo_usuario = tipo_usuario
 
 class PontoColeta(db.Model):
