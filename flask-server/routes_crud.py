@@ -149,7 +149,9 @@ def get_pontos():
         'nome': p.nome,
         'endereco': p.endereco,
         'tipo_residuo': p.tipo_residuo,
-        'cidade_id': p.cidade_id
+        'cidade_id': p.cidade_id,
+        'x': p.x,
+        'y': p.y
     } for p in pontos])
 
 @routes.route('/pontos/<int:id_ponto>', methods=['GET'])
@@ -160,7 +162,9 @@ def get_ponto(id_ponto):
         'nome': p.nome,
         'endereco': p.endereco,
         'tipo_residuo': p.tipo_residuo,
-        'cidade_id': p.cidade_id
+        'cidade_id': p.cidade_id,
+        'x': p.x,
+        'y': p.y
     })
 
 @routes.route('/pontos', methods=['POST'])
@@ -170,7 +174,9 @@ def create_ponto():
         nome=data['nome'],
         endereco=data.get('endereco'),
         tipo_residuo=data.get('tipo_residuo'),
-        cidade_id=data['cidade_id']
+        cidade_id=data['cidade_id'],
+        x=data['x'],
+        y=data['y']
     )
     db.session.add(p)
     db.session.commit()
@@ -179,7 +185,9 @@ def create_ponto():
         'nome': p.nome,
         'endereco': p.endereco,
         'tipo_residuo': p.tipo_residuo,
-        'cidade_id': p.cidade_id
+        'cidade_id': p.cidade_id,
+        'x': p.x,
+        'y': p.y
     }), 201
 
 @routes.route('/pontos/<int:id_ponto>', methods=['PUT'])
@@ -190,13 +198,17 @@ def update_ponto(id_ponto):
     p.endereco = data.get('endereco', p.endereco)
     p.tipo_residuo = data.get('tipo_residuo', p.tipo_residuo)
     p.cidade_id = data.get('cidade_id', p.cidade_id)
+    p.x = data.get('x', p.x)
+    p.y = data.get('y', p.y)
     db.session.commit()
     return jsonify({
         'id_ponto': p.id_ponto,
         'nome': p.nome,
         'endereco': p.endereco,
         'tipo_residuo': p.tipo_residuo,
-        'cidade_id': p.cidade_id
+        'cidade_id': p.cidade_id,
+        'x': p.x,
+        'y': p.y
     })
 
 @routes.route('/pontos/<int:id_ponto>', methods=['DELETE'])

@@ -9,3 +9,4 @@ def get_grafo(id_cidade):
     if not grafo:
         return jsonify({'erro': 'Grafo não encontrado para esta cidade'}), 404
     return jsonify(grafo)
+

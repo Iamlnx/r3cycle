@@ -43,12 +43,16 @@ class PontoColeta(db.Model):
     endereco = db.Column(db.String(150))
     tipo_residuo = db.Column(db.String(100))
     cidade_id = db.Column(db.Integer, db.ForeignKey('cidade.id_cidade'), nullable=False)
+    x = db.Column(db.Integer, nullable=True)
+    y = db.Column(db.Integer, nullable=True)
 
-    def __init__(self, nome, cidade_id, endereco=None, tipo_residuo=None):
+    def __init__(self, nome, cidade_id, endereco=None, tipo_residuo=None, x=None, y=None):
         self.nome = nome
         self.cidade_id = cidade_id
         self.endereco = endereco
         self.tipo_residuo = tipo_residuo
+        self.x = x
+        self.y = y
 
 class Conexao(db.Model):
     __tablename__ = 'conexao'
