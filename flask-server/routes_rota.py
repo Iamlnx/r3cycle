@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from models import db
 from graphs import gerar_grafo_por_cidade, marcar_edges_com_classe
 from dijkstra import dijkstra
-from tsp import nearest_neighbor_tsp, calcular_custo_rota
+from dfs import dfs_visit_all, calcular_custo_rota
 
 rota_routes = Blueprint('rota_routes', __name__)
 
@@ -36,7 +36,7 @@ def grafo_rota():
         return jsonify({"erro": f"Ponto inicial '{inicio}' não encontrado na cidade"}), 400
 
     # Rota sequencial TSP (vizinho mais próximo)
-    rota_tsp = nearest_neighbor_tsp(grafo_denso, inicio)
+    rota_tsp = dfs_visit_all(grafo_denso, inicio)
     ultimo_ponto_tsp = rota_tsp[-1]
 
     # Opcional: caminho de volta para fechar o ciclo, se desejar
