@@ -1,73 +1,88 @@
-import React, { useEffect, useState } from 'react';
-import ReactFlow from 'reactflow';
-import 'reactflow/dist/style.css';
-import api from '../services/api'; // seu arquivo de configuração do axios
+import React from 'react';
+import CytoscapeComponent from 'react-cytoscapejs';
 
-// Função utilitária para converter o grafo do backend para nodes e edges do ReactFlow
-function graphToFlow(cidade) {
-  const nodes = [];
-  const edges = [];
-  const addedEdges = new Set();
+export default function GraphView({ elements }) {
+  const SPACING_FACTOR = 2.8;
 
-  Object.keys(cidade).forEach((node, idx) => {
-    nodes.push({
-      id: node,
-      data: { label: node },
-      position: { x: 100 + idx * 150, y: 100 + (idx % 5) * 100 }, // simples, pode ajustar
-    });
-    Object.entries(cidade[node]).forEach(([target, weight]) => {
-      const edgeKey = [node, target].sort().join('-');
-      if (!addedEdges.has(edgeKey)) {
-        edges.push({
-          id: `${node}-${target}`,
-          source: node,
-          target: target,
-          label: String(weight),
-          data: { weight },
-          animated: true,
-        });
-        addedEdges.add(edgeKey);
-      }
-    });
-  });
-
-  return { nodes, edges };
-}
-
-export default function GraphView({ idCidade }) {
-  const [nodes, setNodes] = useState([]);
-  const [edges, setEdges] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [erro, setErro] = useState('');
-
-  useEffect(() => {
-    async function fetchGraph() {
-      setLoading(true);
-      setErro('');
-      try {
-        const response = await api.get(`/grafo/${idCidade}`);
-        const { nodes, edges } = graphToFlow(response.data);
-        setNodes(nodes);
-        setEdges(edges);
-      } catch (e) {
-        setErro('Não foi possível carregar o grafo.');
-      } finally {
-        setLoading(false);
-      }
-    }
-    if (idCidade) fetchGraph();
-  }, [idCidade]);
-
-  if (loading) return <div>Carregando grafo...</div>;
-  if (erro) return <div>{erro}</div>;
-  if (nodes.length === 0) return <div>Nenhum nó encontrado.</div>;
+  // Ajusta positions (se necessário)
+  const adjustedElements = elements.map(el =>
+    el.position
+      ? { ...el, position: { x: el.position.x * SPACING_FACTOR, y: el.position.y * SPACING_FACTOR } }
+      : el
+  );
 
   return (
-    <div style={{ width: '100vw', height: '80vh' }}>
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        fitView
+    <div className="w-full h-full relative">
+      <CytoscapeComponent
+        elements={adjustedElements}
+        style={{ width: '100%', height: '100%' }}
+        layout={{
+          name: 'preset',
+          padding: 20,
+        }}
+        minZoom={1}
+        maxZoom={1}
+        userPanningEnabled={false}
+        userZoomingEnabled={false}
+        boxSelectionEnabled={false}
+        autoungrabify={true}
+        autounselectify={true}
+        cy={cy => {
+          cy.nodes().forEach(n => n.ungrabify());
+        }}
+        stylesheet={[
+          {
+            selector: 'node',
+            style: {
+              'label': 'data(label)',
+              'background-color': '#386641',
+              'color': '#fff',
+              'font-size': 12,
+              'text-valign': 'center',
+              'text-halign': 'center',
+              'width': 120,
+              'height': 70,
+              'cursor': 'default'
+            }
+          },
+          {
+            selector: 'edge',
+            style: {
+              'label': 'data(weight)',
+              'width': 3,
+              'line-color': '#C4C9C5',
+              'target-arrow-color': '#C4C9C5',
+              'target-arrow-shape': 'triangle', // <-- seta na aresta
+              'curve-style': 'bezier',
+              'font-size': 16,
+              'text-background-opacity': 1,
+              'text-background-color': '#fff',
+              'text-background-padding': 2,
+              'text-margin-y': -14,
+              'arrow-scale': 2,
+              'cursor': 'default'
+            }
+          },
+          {
+            selector: 'edge.tsp',
+            style: {
+              'line-color': '#FF9800',
+              'target-arrow-color': '#FF9800',
+              'width': 8,
+              'z-index': 9999
+            }
+          },
+          {
+            selector: 'edge.dijkstra',
+            style: {
+              'line-color': '#2196f3',
+              'target-arrow-color': '#2196f3',
+              'width': 8,
+              'z-index': 9999
+            }
+          }
+        ]}
+        className="cyto-custom"
       />
     </div>
   );

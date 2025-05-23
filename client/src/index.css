@@ -3,3 +3,10 @@
 *{
   font-family: "Barlow Semi Condensed", sans-serif;
 }
+.custom-react-flow .react-flow__node,
+.custom-react-flow .react-flow__edge-path,
+.custom-react-flow .react-flow__pane,
+.custom-react-flow .react-flow__handle,
+.custom-react-flow .react-flow__edges {
+  cursor: default !important;
+}
