@@ -11,7 +11,6 @@ def dfs_visit_all(grafo, inicio):
                 # Se quiser que o caminhoneiro volte pelo mesmo caminho:
                 rota.append(atual)
 
-    dfs(inicio)
     return rota
 
 def calcular_custo_rota(grafo, rota):
