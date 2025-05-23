@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from models import db
 from graphs import gerar_grafo_por_cidade, marcar_edges_com_classe
 from dijkstra import dijkstra
-from prim import rota_dfs_mst, calcular_custo_rota
+from tsp import nearest_neighbor_tsp, calcular_custo_rota
 
 rota_routes = Blueprint('rota_routes', __name__)
 
@@ -21,7 +21,7 @@ def grafo_rota():
     nodes = grafo_cytoscape["nodes"]
     edges = grafo_cytoscape["edges"]
 
-    # Monta grafo denso para Prim/Dijkstra
+    # Monta grafo denso para TSP/Dijkstra
     # grafo_denso: {nome: {vizinho: peso, ...}, ...}
     grafo_denso = {}
     for edge in edges:
@@ -35,24 +35,26 @@ def grafo_rota():
     if inicio not in grafo_denso:
         return jsonify({"erro": f"Ponto inicial '{inicio}' não encontrado na cidade"}), 400
 
-    # Prim route
-    rota_prim = rota_dfs_mst(grafo_denso, inicio)
-    ultimo_ponto_prim = rota_prim[-1]
-    # Dijkstra route
-    menor_caminho, _ = dijkstra(grafo_denso, ultimo_ponto_prim, inicio)
+    # Rota sequencial TSP (vizinho mais próximo)
+    rota_tsp = nearest_neighbor_tsp(grafo_denso, inicio)
+    ultimo_ponto_tsp = rota_tsp[-1]
+
+    # Opcional: caminho de volta para fechar o ciclo, se desejar
+    menor_caminho, _ = dijkstra(grafo_denso, ultimo_ponto_tsp, inicio)
 
     # Converte rotas para lista de edges (tuplas)
-    edges_prim = get_edges_from_path(rota_prim)
+    edges_tsp = get_edges_from_path(rota_tsp)
     edges_dijkstra = get_edges_from_path(menor_caminho)
 
     # Marca as edges destacadas
-    nodes, edges = marcar_edges_com_classe(nodes, edges, edges_prim, edges_dijkstra)
+    nodes, edges = marcar_edges_com_classe(nodes, edges, edges_tsp, edges_dijkstra)
 
     # Junta nodes + edges para Cytoscape
     elements = nodes + edges
 
     return jsonify({
         "elements": elements,
-        "prim": rota_prim,
+        "tsp": rota_tsp,
         "dijkstra": menor_caminho
     })
+
