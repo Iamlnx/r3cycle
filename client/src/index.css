@@ -10,3 +10,6 @@
 .custom-react-flow .react-flow__edges {
   cursor: default !important;
 }
+body{
+  height: 100%;
+}

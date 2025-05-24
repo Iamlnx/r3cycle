@@ -69,7 +69,7 @@ function Home() {
   }
 
   return (
-    <main className="bg-[#E8EEF2] h-full w-full">
+    <main className=" h-full w-full">
       <NavBar />
       <div className='mx-20 mt-5'>
         <h1 className='font-bold text-xl'>Rotas</h1>
@@ -78,7 +78,7 @@ function Home() {
           {cidades.map((cidade) => (
             <button
               key={cidade.id_cidade}
-              className={`px-4 py-2 cursor-pointer rounded shadow ${idCidadeSelecionada === cidade.id_cidade ? 'bg-blue-700 text-white' : 'bg-white text-blue-700'}`}
+              className={`px-4 py-2 cursor-pointer rounded shadow ${idCidadeSelecionada === cidade.id_cidade ? 'bg-[#386641] text-white' : 'bg-white text-[#386641]'}`}
               onClick={() => setIdCidadeSelecionada(cidade.id_cidade)}
             >
               {cidade.nome}

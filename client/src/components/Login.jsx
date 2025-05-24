@@ -1,22 +1,29 @@
 import { useState } from 'react';
 import api from '../services/api';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [erro, setErro] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setErro('');
+    setLoading(true);
     try {
-      const resp = await api.post('/login', { email, senha }, { withCredentials: true });
-      alert('Login realizado com sucesso!');
-      navigate('/'); // Redireciona para Home após login
+      await api.post('/login', { email, senha }, { withCredentials: true });
+      const status = await api.get('/status');
+      login(status.data.usuario);
+      navigate('/');
     } catch (err) {
       setErro(err.response?.data?.erro || 'Erro ao fazer login');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -38,10 +45,12 @@ function Login() {
           onChange={e => setSenha(e.target.value)}
           required
         />
-        <button type="submit">Entrar</button>
+        <button type="submit" disabled={loading}>
+          {loading ? 'Entrando...' : 'Entrar'}
+        </button>
       </form>
       {erro && <p style={{ color: 'red' }}>{erro}</p>}
-      <p>Não tem conta? <a href="/register">Registre-se</a></p>
+      <p>Não tem conta? <Link to="/register">Registre-se</Link></p>
     </div>
   );
 }

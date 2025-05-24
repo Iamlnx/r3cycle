@@ -1,89 +1,115 @@
-import React from 'react';
-import CytoscapeComponent from 'react-cytoscapejs';
+import React, { useMemo } from "react";
+import ReactFlow, { Background, Controls } from "reactflow";
+import "reactflow/dist/style.css";
+
+// Converte elementos do Cytoscape para nodes/edges do React Flow
+function cytoToReactFlow(elements, spacing = 2.8) {
+  const nodes = [];
+  const edges = [];
+
+  elements.forEach((el) => {
+    if (el.data && el.data.id && !el.data.source && !el.data.target) {
+      // Node
+      nodes.push({
+        id: el.data.id,
+        data: { label: el.data.label },
+        position: el.position
+          ? {
+              x: el.position.x * spacing,
+              y: el.position.y * spacing,
+            }
+          : { x: 0, y: 0 },
+        style: {
+          background: "#386641",
+          color: "#fff",
+          width: 120,
+          height: 70,
+          borderRadius: 10,
+          fontSize: 12,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          border: "none",
+          cursor: "default",
+        },
+        draggable: false,
+      });
+    } else if (el.data && el.data.source && el.data.target) {
+      // Edge
+      edges.push({
+        id: el.data.id || `${el.data.source}-${el.data.target}`,
+        source: el.data.source,
+        target: el.data.target,
+        label: el.data.weight ? String(el.data.weight) : undefined,
+        type: "default",
+        style: {
+          strokeWidth:
+            el.classes?.includes("tsp") || el.classes?.includes("dijkstra")
+              ? 8
+              : 3,
+          stroke:
+            el.classes?.includes("tsp")
+              ? "#FF9800"
+              : el.classes?.includes("dijkstra")
+              ? "#2196f3"
+              : "#C4C9C5",
+          cursor: "default",
+          zIndex:
+            el.classes?.includes("tsp") || el.classes?.includes("dijkstra")
+              ? 9999
+              : undefined,
+        },
+        markerEnd: {
+          type: "arrowclosed",
+          color:
+            el.classes?.includes("tsp")
+              ? "#FF9800"
+              : el.classes?.includes("dijkstra")
+              ? "#2196f3"
+              : "#C4C9C5",
+        },
+        labelStyle: {
+          fill: "#222",
+          fontWeight: 600,
+          fontSize: 16,
+          background: "#fff",
+          padding: "2px 6px",
+          borderRadius: 4,
+          marginTop: -14,
+        },
+      });
+    }
+  });
+
+  return { nodes, edges };
+}
 
 export default function GraphView({ elements }) {
-  const SPACING_FACTOR = 2.8;
-
-  // Ajusta positions (se necessário)
-  const adjustedElements = elements.map(el =>
-    el.position
-      ? { ...el, position: { x: el.position.x * SPACING_FACTOR, y: el.position.y * SPACING_FACTOR } }
-      : el
+  const { nodes, edges } = useMemo(
+    () => cytoToReactFlow(elements),
+    [elements]
   );
 
   return (
     <div className="w-full h-full relative">
-      <CytoscapeComponent
-        elements={adjustedElements}
-        style={{ width: '100%', height: '100%' }}
-        layout={{
-          name: 'preset',
-          padding: 20,
-        }}
-        minZoom={1}
-        maxZoom={1}
-        userPanningEnabled={false}
-        userZoomingEnabled={false}
-        boxSelectionEnabled={false}
-        autoungrabify={true}
-        autounselectify={true}
-        cy={cy => {
-          cy.nodes().forEach(n => n.ungrabify());
-        }}
-        stylesheet={[
-          {
-            selector: 'node',
-            style: {
-              'label': 'data(label)',
-              'background-color': '#386641',
-              'color': '#fff',
-              'font-size': 12,
-              'text-valign': 'center',
-              'text-halign': 'center',
-              'width': 120,
-              'height': 70,
-              'cursor': 'default'
-            }
-          },
-          {
-            selector: 'edge',
-            style: {
-              'label': 'data(weight)',
-              'width': 3,
-              'line-color': '#C4C9C5',
-              'target-arrow-color': '#C4C9C5',
-              'target-arrow-shape': 'triangle', // <-- seta na aresta
-              'curve-style': 'bezier',
-              'font-size': 16,
-              'text-background-opacity': 1,
-              'text-background-color': '#fff',
-              'text-background-padding': 2,
-              'text-margin-y': -14,
-              'arrow-scale': 2,
-              'cursor': 'default'
-            }
-          },
-          {
-            selector: 'edge.tsp',
-            style: {
-              'line-color': '#FF9800',
-              'target-arrow-color': '#FF9800',
-              'width': 8,
-              'z-index': 9999
-            }
-          },
-          {
-            selector: 'edge.dijkstra',
-            style: {
-              'line-color': '#2196f3',
-              'target-arrow-color': '#2196f3',
-              'width': 8,
-              'z-index': 9999
-            }
-          }
-        ]}
-        className="cyto-custom"
-      />
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        fitView
+        pannable={false}
+        zoomOnScroll={false}
+        zoomOnPinch={false}
+        zoomOnDoubleClick={false}
+        panOnDrag={false}
+        nodesDraggable={false}
+        nodesConnectable={false}
+        elementsSelectable={false}
+        selectionOnDrag={false}
+        proOptions={{ hideAttribution: true }}
+      >
+        <Background />
+        <Controls showZoom={false} showFitView={false} />
+      </ReactFlow>
     </div>
   );
 }

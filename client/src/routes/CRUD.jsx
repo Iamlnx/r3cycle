@@ -475,10 +475,10 @@ export default function CRUD() {
   }
 
   return (
-    <main className="bg-[#E8EEF2] h-full min-h-screen w-full">
+    <main className=" h-full min-h-screen w-full">
       <NavBar />
       <div className='mx-20 mt-5'>
-        <h1 className='font-bold text-xl mb-4'>CRUD do Sistema</h1>
+        <h1 className='font-bold text-xl mb-4'>BANCO DE DADOS</h1>
         <div className="flex gap-3 mb-6">
           {TABS.map(tab => (
             <button
