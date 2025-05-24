@@ -40,12 +40,15 @@ def logout():
     session.clear()
     return jsonify({'mensagem': 'Logout realizado com sucesso'})
 
-@auth_routes.route('/status')
+@auth_routes.route('/status', methods=['GET'])
 def status():
     if 'usuario_id' in session:
         return jsonify({
-            'logado_como': session.get('usuario_nome'),
-            'email': session.get('usuario_email'),
-            'tipo_usuario': session.get('tipo_usuario')
+            'usuario': {
+                'id': session['usuario_id'],
+                'nome': session['usuario_nome'],
+                'email': session['usuario_email'],
+                'tipo_usuario': session['tipo_usuario']
+            }
         })
-    return jsonify({'logado_como': None})
+    return jsonify({'usuario': None}), 401
