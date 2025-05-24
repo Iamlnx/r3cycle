@@ -2,14 +2,12 @@ import React, { useMemo } from "react";
 import ReactFlow, { Background, Controls } from "reactflow";
 import "reactflow/dist/style.css";
 
-// Converte elementos do Cytoscape para nodes/edges do React Flow
 function cytoToReactFlow(elements, spacing = 2.8) {
   const nodes = [];
   const edges = [];
-
   elements.forEach((el) => {
+    console.log(el);
     if (el.data && el.data.id && !el.data.source && !el.data.target) {
-      // Node
       nodes.push({
         id: el.data.id,
         data: { label: el.data.label },
@@ -35,39 +33,26 @@ function cytoToReactFlow(elements, spacing = 2.8) {
         draggable: false,
       });
     } else if (el.data && el.data.source && el.data.target) {
-      // Edge
+      // Defina a cor da linha
+      let stroke = "#C4C9C5";
+      let strokeWidth = 3;
+      if (el.classes?.includes("tsp") || el.classes?.includes("dijkstra")) {
+        stroke = "#386641";
+        strokeWidth = 8;
+      }
       edges.push({
         id: el.data.id || `${el.data.source}-${el.data.target}`,
         source: el.data.source,
         target: el.data.target,
         label: el.data.weight ? String(el.data.weight) : undefined,
-        type: "default",
+        type: "straight", // LINHAS RETAS!
         style: {
-          strokeWidth:
-            el.classes?.includes("tsp") || el.classes?.includes("dijkstra")
-              ? 8
-              : 3,
-          stroke:
-            el.classes?.includes("tsp")
-              ? "#FF9800"
-              : el.classes?.includes("dijkstra")
-              ? "#2196f3"
-              : "#C4C9C5",
+          strokeWidth,
+          stroke,
           cursor: "default",
-          zIndex:
-            el.classes?.includes("tsp") || el.classes?.includes("dijkstra")
-              ? 9999
-              : undefined,
+          zIndex: strokeWidth === 8 ? 9999 : undefined,
         },
-        markerEnd: {
-          type: "arrowclosed",
-          color:
-            el.classes?.includes("tsp")
-              ? "#FF9800"
-              : el.classes?.includes("dijkstra")
-              ? "#2196f3"
-              : "#C4C9C5",
-        },
+        // Removido markerEnd para não mostrar seta
         labelStyle: {
           fill: "#222",
           fontWeight: 600,
@@ -80,15 +65,11 @@ function cytoToReactFlow(elements, spacing = 2.8) {
       });
     }
   });
-
   return { nodes, edges };
 }
 
 export default function GraphView({ elements }) {
-  const { nodes, edges } = useMemo(
-    () => cytoToReactFlow(elements),
-    [elements]
-  );
+  const { nodes, edges } = useMemo(() => cytoToReactFlow(elements), [elements]);
 
   return (
     <div className="w-full h-full relative">
@@ -96,19 +77,21 @@ export default function GraphView({ elements }) {
         nodes={nodes}
         edges={edges}
         fitView
-        pannable={false}
-        zoomOnScroll={false}
-        zoomOnPinch={false}
-        zoomOnDoubleClick={false}
-        panOnDrag={false}
+        pannable={true}
+        zoomOnScroll={true}
+        zoomOnPinch={true}
+        zoomOnDoubleClick={true}
+        panOnDrag={true}
         nodesDraggable={false}
         nodesConnectable={false}
         elementsSelectable={false}
         selectionOnDrag={false}
         proOptions={{ hideAttribution: true }}
+        minZoom={0.2}
+        maxZoom={2}
       >
         <Background />
-        <Controls showZoom={false} showFitView={false} />
+        <Controls showZoom={true} showFitView={true} />
       </ReactFlow>
     </div>
   );

@@ -122,58 +122,63 @@ export default function CRUD() {
 
   // Renderiza tabela e formulário conforme aba ativa
   function renderTableAndForm() {
+    // ... (mantém o código igual ao seu, só adaptando para responsividade nas tabelas e formulários)
+    // Adiciona overflow-x-auto e tabelas responsivas
+    // Exemplo para estados:
     if (activeTab === 'estados') {
       return (
         <>
           <h2 className="font-bold mb-2">Cadastro de Estado</h2>
-          <form className="mb-4 flex gap-2" onSubmit={handleCadastro}>
+          <form className="mb-4 flex flex-col sm:flex-row gap-2" onSubmit={handleCadastro}>
             <input
-              className="border rounded px-2 py-1"
+              className="border rounded px-2 py-1 flex-1"
               name="nome"
               placeholder="Nome do Estado"
               value={form.nome || ''}
               onChange={handleFormChange}
               required
             />
-            <button style={{ background: VERDE }} className="text-white rounded px-3" type="submit" disabled={loading}>Salvar</button>
+            <button style={{ background: VERDE }} className="text-white rounded px-3 py-1" type="submit" disabled={loading}>Salvar</button>
           </form>
           <h3 className="font-semibold mb-1">Lista de Estados</h3>
-          <table className="w-full bg-white rounded shadow mb-6">
-            <thead>
-              <tr className='text-left'>
-                <th className="px-2 py-1">ID</th>
-                <th className="px-2 py-1">Nome</th>
-                <th className="px-2 py-1">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {estados.map(e => (
-                <tr key={e.id_estado}>
-                  <td className="px-2 py-1">{e.id_estado}</td>
-                  <td className="px-2 py-1">{e.nome}</td>
-                  <td className="px-2 py-1">
-                    <button
-                      style={{ color: VERDE }}
-                      className="px-2 py-1 rounded hover:bg-green-50"
-                      onClick={() => handleDelete('estados', e.id_estado)}
-                      disabled={loading}
-                    >Excluir</button>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="min-w-[400px] w-full bg-white rounded shadow mb-6 text-sm">
+              <thead>
+                <tr className='text-left'>
+                  <th className="px-2 py-1">ID</th>
+                  <th className="px-2 py-1">Nome</th>
+                  <th className="px-2 py-1">Ações</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {estados.map(e => (
+                  <tr key={e.id_estado}>
+                    <td className="px-2 py-1">{e.id_estado}</td>
+                    <td className="px-2 py-1">{e.nome}</td>
+                    <td className="px-2 py-1">
+                      <button
+                        style={{ color: VERDE }}
+                        className="px-2 py-1 rounded hover:bg-green-50"
+                        onClick={() => handleDelete('estados', e.id_estado)}
+                        disabled={loading}
+                      >Excluir</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </>
       );
     }
-
+    // Mesma ideia para as outras abas:
     if (activeTab === 'cidades') {
       return (
         <>
           <h2 className="font-bold mb-2">Cadastro de Cidade</h2>
-          <form className="mb-4 flex gap-2 flex-wrap items-end" onSubmit={handleCadastro}>
+          <form className="mb-4 flex flex-col sm:flex-row flex-wrap gap-2 items-end" onSubmit={handleCadastro}>
             <input
-              className="border rounded px-2 py-1"
+              className="border rounded px-2 py-1 flex-1"
               name="nome"
               placeholder="Nome da Cidade"
               value={form.nome || ''}
@@ -181,7 +186,7 @@ export default function CRUD() {
               required
             />
             <select
-              className="border rounded px-2 py-1"
+              className="border rounded px-2 py-1 flex-1"
               name="id_estado"
               value={form.id_estado || ''}
               onChange={handleFormChange}
@@ -192,47 +197,48 @@ export default function CRUD() {
                 <option key={e.id_estado} value={e.id_estado}>{e.nome}</option>
               ))}
             </select>
-            <button style={{ background: VERDE }} className="text-white rounded px-3" type="submit" disabled={loading}>Salvar</button>
+            <button style={{ background: VERDE }} className="text-white rounded px-3 py-1" type="submit" disabled={loading}>Salvar</button>
           </form>
           <h3 className="font-semibold mb-1">Lista de Cidades</h3>
-          <table className="w-full bg-white rounded shadow mb-6">
-            <thead>
-              <tr className='text-left'>
-                <th className="px-2 py-1">ID</th>
-                <th className="px-2 py-1">Nome</th>
-                <th className="px-2 py-1">Estado</th>
-                <th className="px-2 py-1">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {cidades.map(c => (
-                <tr key={c.id_cidade} className='text-left'>
-                  <td className="px-2 py-1">{c.id_cidade}</td>
-                  <td className="px-2 py-1">{c.nome}</td>
-                  <td className="px-2 py-1">{estados.find(e => e.id_estado === c.id_estado)?.nome || ""}</td>
-                  <td className="px-2 py-1">
-                    <button
-                      style={{ color: VERDE }}
-                      className="px-2 py-1 rounded hover:bg-green-50"
-                      onClick={() => handleDelete('cidades', c.id_cidade)}
-                      disabled={loading}
-                    >Excluir</button>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="min-w-[500px] w-full bg-white rounded shadow mb-6 text-sm">
+              <thead>
+                <tr className='text-left'>
+                  <th className="px-2 py-1">ID</th>
+                  <th className="px-2 py-1">Nome</th>
+                  <th className="px-2 py-1">Estado</th>
+                  <th className="px-2 py-1">Ações</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {cidades.map(c => (
+                  <tr key={c.id_cidade} className='text-left'>
+                    <td className="px-2 py-1">{c.id_cidade}</td>
+                    <td className="px-2 py-1">{c.nome}</td>
+                    <td className="px-2 py-1">{estados.find(e => e.id_estado === c.id_estado)?.nome || ""}</td>
+                    <td className="px-2 py-1">
+                      <button
+                        style={{ color: VERDE }}
+                        className="px-2 py-1 rounded hover:bg-green-50"
+                        onClick={() => handleDelete('cidades', c.id_cidade)}
+                        disabled={loading}
+                      >Excluir</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </>
       );
     }
-
     if (activeTab === 'usuarios') {
       return (
         <>
           <h2 className="font-bold mb-2">Cadastro de Usuário</h2>
-          <form className="mb-4 flex gap-2 flex-wrap items-end" onSubmit={handleCadastro}>
+          <form className="mb-4 flex flex-col sm:flex-row flex-wrap gap-2 items-end" onSubmit={handleCadastro}>
             <input
-              className="border rounded px-2 py-1"
+              className="border rounded px-2 py-1 flex-1"
               name="nome"
               placeholder="Nome"
               value={form.nome || ''}
@@ -240,7 +246,7 @@ export default function CRUD() {
               required
             />
             <input
-              className="border rounded px-2 py-1"
+              className="border rounded px-2 py-1 flex-1"
               name="email"
               type="email"
               placeholder="Email"
@@ -249,7 +255,7 @@ export default function CRUD() {
               required
             />
             <input
-              className="border rounded px-2 py-1"
+              className="border rounded px-2 py-1 flex-1"
               name="senha"
               type="password"
               placeholder="Senha"
@@ -258,55 +264,56 @@ export default function CRUD() {
               required
             />
             <input
-              className="border rounded px-2 py-1"
+              className="border rounded px-2 py-1 flex-1"
               name="tipo_usuario"
               placeholder="Tipo de Usuário (opcional)"
               value={form.tipo_usuario || ''}
               onChange={handleFormChange}
             />
-            <button style={{ background: VERDE }} className="text-white rounded px-3" type="submit" disabled={loading}>Salvar</button>
+            <button style={{ background: VERDE }} className="text-white rounded px-3 py-1" type="submit" disabled={loading}>Salvar</button>
           </form>
           <h3 className="font-semibold mb-1">Lista de Usuários</h3>
-          <table className="w-full bg-white rounded shadow mb-6">
-            <thead>
-              <tr className='text-left'>
-                <th className="px-2 py-1">ID</th>
-                <th className="px-2 py-1">Nome</th>
-                <th className="px-2 py-1">Email</th>
-                <th className="px-2 py-1">Tipo</th>
-                <th className="px-2 py-1">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {usuarios.map(u => (
-                <tr key={u.id_usuario}>
-                  <td className="px-2 py-1">{u.id_usuario}</td>
-                  <td className="px-2 py-1">{u.nome}</td>
-                  <td className="px-2 py-1">{u.email}</td>
-                  <td className="px-2 py-1">{u.tipo_usuario}</td>
-                  <td className="px-2 py-1">
-                    <button
-                      style={{ color: VERDE }}
-                      className="px-2 py-1 rounded hover:bg-green-50"
-                      onClick={() => handleDelete('usuarios', u.id_usuario)}
-                      disabled={loading}
-                    >Excluir</button>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="min-w-[500px] w-full bg-white rounded shadow mb-6 text-sm">
+              <thead>
+                <tr className='text-left'>
+                  <th className="px-2 py-1">ID</th>
+                  <th className="px-2 py-1">Nome</th>
+                  <th className="px-2 py-1">Email</th>
+                  <th className="px-2 py-1">Tipo</th>
+                  <th className="px-2 py-1">Ações</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {usuarios.map(u => (
+                  <tr key={u.id_usuario}>
+                    <td className="px-2 py-1">{u.id_usuario}</td>
+                    <td className="px-2 py-1">{u.nome}</td>
+                    <td className="px-2 py-1">{u.email}</td>
+                    <td className="px-2 py-1">{u.tipo_usuario}</td>
+                    <td className="px-2 py-1">
+                      <button
+                        style={{ color: VERDE }}
+                        className="px-2 py-1 rounded hover:bg-green-50"
+                        onClick={() => handleDelete('usuarios', u.id_usuario)}
+                        disabled={loading}
+                      >Excluir</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </>
       );
     }
-
     if (activeTab === 'pontos') {
       return (
         <>
           <h2 className="font-bold mb-2">Cadastro de Ponto de Coleta</h2>
-          <form className="mb-4 flex gap-2 flex-wrap items-end" onSubmit={handleCadastro}>
+          <form className="mb-4 flex flex-col sm:flex-row flex-wrap gap-2 items-end" onSubmit={handleCadastro}>
             <input
-              className="border rounded px-2 py-1"
+              className="border rounded px-2 py-1 flex-1"
               name="nome"
               placeholder="Nome do Ponto"
               value={form.nome || ''}
@@ -314,7 +321,7 @@ export default function CRUD() {
               required
             />
             <select
-              className="border rounded px-2 py-1"
+              className="border rounded px-2 py-1 flex-1"
               name="cidade_id"
               value={form.cidade_id || ''}
               onChange={handleFormChange}
@@ -326,21 +333,21 @@ export default function CRUD() {
               ))}
             </select>
             <input
-              className="border rounded px-2 py-1"
+              className="border rounded px-2 py-1 flex-1"
               name="endereco"
               placeholder="Endereço"
               value={form.endereco || ''}
               onChange={handleFormChange}
             />
             <input
-              className="border rounded px-2 py-1"
+              className="border rounded px-2 py-1 flex-1"
               name="tipo_residuo"
               placeholder="Tipo de Resíduo"
               value={form.tipo_residuo || ''}
               onChange={handleFormChange}
             />
             <input
-              className="border rounded px-2 py-1"
+              className="border rounded px-2 py-1 w-20"
               name="x"
               type="number"
               placeholder="X"
@@ -348,62 +355,63 @@ export default function CRUD() {
               onChange={handleFormChange}
             />
             <input
-              className="border rounded px-2 py-1"
+              className="border rounded px-2 py-1 w-20"
               name="y"
               type="number"
               placeholder="Y"
               value={form.y || ''}
               onChange={handleFormChange}
             />
-            <button style={{ background: VERDE }} className="text-white rounded px-3" type="submit" disabled={loading}>Salvar</button>
+            <button style={{ background: VERDE }} className="text-white rounded px-3 py-1" type="submit" disabled={loading}>Salvar</button>
           </form>
           <h3 className="font-semibold mb-1">Lista de Pontos de Coleta</h3>
-          <table className="w-full bg-white rounded shadow mb-6">
-            <thead>
-              <tr className='text-left'>
-                <th className="px-2 py-1">ID</th>
-                <th className="px-2 py-1">Nome</th>
-                <th className="px-2 py-1">Endereço</th>
-                <th className="px-2 py-1">Tipo de Resíduo</th>
-                <th className="px-2 py-1">Cidade</th>
-                <th className="px-2 py-1">X</th>
-                <th className="px-2 py-1">Y</th>
-                <th className="px-2 py-1">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pontos.map(p => (
-                <tr key={p.id_ponto}>
-                  <td className="px-2 py-1">{p.id_ponto}</td>
-                  <td className="px-2 py-1">{p.nome}</td>
-                  <td className="px-2 py-1">{p.endereco}</td>
-                  <td className="px-2 py-1">{p.tipo_residuo}</td>
-                  <td className="px-2 py-1">{cidades.find(c => c.id_cidade === p.cidade_id)?.nome || ""}</td>
-                  <td className="px-2 py-1">{p.x}</td>
-                  <td className="px-2 py-1">{p.y}</td>
-                  <td className="px-2 py-1">
-                    <button
-                      style={{ color: VERDE }}
-                      className="px-2 py-1 rounded hover:bg-green-50"
-                      onClick={() => handleDelete('pontos', p.id_ponto)}
-                      disabled={loading}
-                    >Excluir</button>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="min-w-[700px] w-full bg-white rounded shadow mb-6 text-sm">
+              <thead>
+                <tr className='text-left'>
+                  <th className="px-2 py-1">ID</th>
+                  <th className="px-2 py-1">Nome</th>
+                  <th className="px-2 py-1">Endereço</th>
+                  <th className="px-2 py-1">Tipo de Resíduo</th>
+                  <th className="px-2 py-1">Cidade</th>
+                  <th className="px-2 py-1">X</th>
+                  <th className="px-2 py-1">Y</th>
+                  <th className="px-2 py-1">Ações</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {pontos.map(p => (
+                  <tr key={p.id_ponto}>
+                    <td className="px-2 py-1">{p.id_ponto}</td>
+                    <td className="px-2 py-1">{p.nome}</td>
+                    <td className="px-2 py-1">{p.endereco}</td>
+                    <td className="px-2 py-1">{p.tipo_residuo}</td>
+                    <td className="px-2 py-1">{cidades.find(c => c.id_cidade === p.cidade_id)?.nome || ""}</td>
+                    <td className="px-2 py-1">{p.x}</td>
+                    <td className="px-2 py-1">{p.y}</td>
+                    <td className="px-2 py-1">
+                      <button
+                        style={{ color: VERDE }}
+                        className="px-2 py-1 rounded hover:bg-green-50"
+                        onClick={() => handleDelete('pontos', p.id_ponto)}
+                        disabled={loading}
+                      >Excluir</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </>
       );
     }
-
     if (activeTab === 'conexoes') {
       return (
         <>
           <h2 className="font-bold mb-2">Cadastro de Conexão</h2>
-          <form className="mb-4 flex gap-2 flex-wrap items-end" onSubmit={handleCadastro}>
+          <form className="mb-4 flex flex-col sm:flex-row flex-wrap gap-2 items-end" onSubmit={handleCadastro}>
             <select
-              className="border rounded px-2 py-1"
+              className="border rounded px-2 py-1 flex-1"
               name="ponto_origem_id"
               value={form.ponto_origem_id || ''}
               onChange={handleFormChange}
@@ -415,7 +423,7 @@ export default function CRUD() {
               ))}
             </select>
             <select
-              className="border rounded px-2 py-1"
+              className="border rounded px-2 py-1 flex-1"
               name="ponto_destino_id"
               value={form.ponto_destino_id || ''}
               onChange={handleFormChange}
@@ -427,7 +435,7 @@ export default function CRUD() {
               ))}
             </select>
             <input
-              className="border rounded px-2 py-1"
+              className="border rounded px-2 py-1 w-20"
               name="peso"
               type="number"
               placeholder="Peso"
@@ -435,51 +443,52 @@ export default function CRUD() {
               onChange={handleFormChange}
               required
             />
-            <button style={{ background: VERDE }} className="text-white rounded px-3" type="submit" disabled={loading}>Salvar</button>
+            <button style={{ background: VERDE }} className="text-white rounded px-3 py-1" type="submit" disabled={loading}>Salvar</button>
           </form>
           <h3 className="font-semibold mb-1">Lista de Conexões</h3>
-          <table className="w-full bg-white rounded shadow mb-6">
-            <thead>
-              <tr className='text-left'>
-                <th className="px-2 py-1">ID</th>
-                <th className="px-2 py-1">Origem</th>
-                <th className="px-2 py-1">Destino</th>
-                <th className="px-2 py-1">Peso</th>
-                <th className="px-2 py-1">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {conexoes.map(conn => (
-                <tr key={conn.id_conexao}>
-                  <td className="px-2 py-1">{conn.id_conexao}</td>
-                  <td className="px-2 py-1">{pontos.find(p => p.id_ponto === conn.ponto_origem_id)?.nome || conn.ponto_origem_id}</td>
-                  <td className="px-2 py-1">{pontos.find(p => p.id_ponto === conn.ponto_destino_id)?.nome || conn.ponto_destino_id}</td>
-                  <td className="px-2 py-1">{conn.peso}</td>
-                  <td className="px-2 py-1">
-                    <button
-                      style={{ color: VERDE }}
-                      className="px-2 py-1 rounded hover:bg-green-50"
-                      onClick={() => handleDelete('conexoes', conn.id_conexao)}
-                      disabled={loading}
-                    >Excluir</button>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="min-w-[400px] w-full bg-white rounded shadow mb-6 text-sm">
+              <thead>
+                <tr className='text-left'>
+                  <th className="px-2 py-1">ID</th>
+                  <th className="px-2 py-1">Origem</th>
+                  <th className="px-2 py-1">Destino</th>
+                  <th className="px-2 py-1">Peso</th>
+                  <th className="px-2 py-1">Ações</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {conexoes.map(conn => (
+                  <tr key={conn.id_conexao}>
+                    <td className="px-2 py-1">{conn.id_conexao}</td>
+                    <td className="px-2 py-1">{pontos.find(p => p.id_ponto === conn.ponto_origem_id)?.nome || conn.ponto_origem_id}</td>
+                    <td className="px-2 py-1">{pontos.find(p => p.id_ponto === conn.ponto_destino_id)?.nome || conn.ponto_destino_id}</td>
+                    <td className="px-2 py-1">{conn.peso}</td>
+                    <td className="px-2 py-1">
+                      <button
+                        style={{ color: VERDE }}
+                        className="px-2 py-1 rounded hover:bg-green-50"
+                        onClick={() => handleDelete('conexoes', conn.id_conexao)}
+                        disabled={loading}
+                      >Excluir</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </>
       );
     }
-
     return null;
   }
 
   return (
-    <main className=" h-full min-h-screen w-full">
+    <main className="h-full min-h-screen w-full">
       <NavBar />
-      <div className='mx-20 mt-5'>
-        <h1 className='font-bold text-xl mb-4'>BANCO DE DADOS</h1>
-        <div className="flex gap-3 mb-6">
+      <div className="px-4 md:px-20 mt-5">
+        <h1 className="font-bold text-xl mb-4">BANCO DE DADOS</h1>
+        <div className="flex flex-wrap gap-3 mb-6">
           {TABS.map(tab => (
             <button
               key={tab.key}
@@ -493,7 +502,7 @@ export default function CRUD() {
             </button>
           ))}
         </div>
-        <div className="p-4 bg-gray-100 rounded shadow">
+        <div className="p-2 md:p-4 bg-gray-100 rounded shadow">
           {loading ? <div>Carregando...</div> : renderTableAndForm()}
         </div>
       </div>
