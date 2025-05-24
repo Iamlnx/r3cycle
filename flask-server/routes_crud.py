@@ -1,20 +1,44 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from models import db, Estado, Cidade, Usuario, PontoColeta, Conexao
+from functools import wraps
 
 routes = Blueprint('routes', __name__)
 
+# --- Decorator para proteger endpoints de admin ---
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'usuario_id' not in session:
+            return jsonify({'erro': 'Não autorizado'}), 401
+        if session.get('tipo_usuario') != 'admin':
+            return jsonify({'erro': 'Apenas administradores podem acessar'}), 403
+        return f(*args, **kwargs)
+    return decorated_function
+
+# --- Decorator para proteger endpoints autenticados (GETs) ---
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'usuario_id' not in session:
+            return jsonify({'erro': 'Não autorizado'}), 401
+        return f(*args, **kwargs)
+    return decorated_function
+
 # --- CRUD Estado ---
 @routes.route('/estados', methods=['GET'])
+@login_required
 def get_estados():
     estados = Estado.query.all()
     return jsonify([{'id_estado': e.id_estado, 'nome': e.nome} for e in estados])
 
 @routes.route('/estados/<int:id_estado>', methods=['GET'])
+@login_required
 def get_estado(id_estado):
     e = Estado.query.get_or_404(id_estado)
     return jsonify({'id_estado': e.id_estado, 'nome': e.nome})
 
 @routes.route('/estados', methods=['POST'])
+@admin_required
 def create_estado():
     data = request.get_json()
     e = Estado(nome=data['nome'])
@@ -23,6 +47,7 @@ def create_estado():
     return jsonify({'id_estado': e.id_estado, 'nome': e.nome}), 201
 
 @routes.route('/estados/<int:id_estado>', methods=['PUT'])
+@admin_required
 def update_estado(id_estado):
     e = Estado.query.get_or_404(id_estado)
     data = request.get_json()
@@ -31,6 +56,7 @@ def update_estado(id_estado):
     return jsonify({'id_estado': e.id_estado, 'nome': e.nome})
 
 @routes.route('/estados/<int:id_estado>', methods=['DELETE'])
+@admin_required
 def delete_estado(id_estado):
     e = Estado.query.get_or_404(id_estado)
     db.session.delete(e)
@@ -39,16 +65,19 @@ def delete_estado(id_estado):
 
 # --- CRUD Cidade ---
 @routes.route('/cidades', methods=['GET'])
+@login_required
 def get_cidades():
     cidades = Cidade.query.all()
     return jsonify([{'id_cidade': c.id_cidade, 'nome': c.nome, 'id_estado': c.id_estado} for c in cidades])
 
 @routes.route('/cidades/<int:id_cidade>', methods=['GET'])
+@login_required
 def get_cidade(id_cidade):
     c = Cidade.query.get_or_404(id_cidade)
     return jsonify({'id_cidade': c.id_cidade, 'nome': c.nome, 'id_estado': c.id_estado})
 
 @routes.route('/cidades', methods=['POST'])
+@admin_required
 def create_cidade():
     data = request.get_json()
     c = Cidade(nome=data['nome'], id_estado=data['id_estado'])
@@ -57,6 +86,7 @@ def create_cidade():
     return jsonify({'id_cidade': c.id_cidade, 'nome': c.nome, 'id_estado': c.id_estado}), 201
 
 @routes.route('/cidades/<int:id_cidade>', methods=['PUT'])
+@admin_required
 def update_cidade(id_cidade):
     c = Cidade.query.get_or_404(id_cidade)
     data = request.get_json()
@@ -66,6 +96,7 @@ def update_cidade(id_cidade):
     return jsonify({'id_cidade': c.id_cidade, 'nome': c.nome, 'id_estado': c.id_estado})
 
 @routes.route('/cidades/<int:id_cidade>', methods=['DELETE'])
+@admin_required
 def delete_cidade(id_cidade):
     c = Cidade.query.get_or_404(id_cidade)
     db.session.delete(c)
@@ -74,6 +105,7 @@ def delete_cidade(id_cidade):
 
 # --- CRUD Usuario ---
 @routes.route('/usuarios', methods=['GET'])
+@login_required
 def get_usuarios():
     usuarios = Usuario.query.all()
     return jsonify([{
@@ -84,6 +116,7 @@ def get_usuarios():
     } for u in usuarios])
 
 @routes.route('/usuarios/<int:id_usuario>', methods=['GET'])
+@login_required
 def get_usuario(id_usuario):
     u = Usuario.query.get_or_404(id_usuario)
     return jsonify({
@@ -94,6 +127,7 @@ def get_usuario(id_usuario):
     })
 
 @routes.route('/usuarios/<int:id_usuario>', methods=['PUT'])
+@admin_required
 def update_usuario(id_usuario):
     u = Usuario.query.get_or_404(id_usuario)
     data = request.get_json()
@@ -110,6 +144,7 @@ def update_usuario(id_usuario):
     })
 
 @routes.route('/usuarios/<int:id_usuario>', methods=['DELETE'])
+@admin_required
 def delete_usuario(id_usuario):
     u = Usuario.query.get_or_404(id_usuario)
     db.session.delete(u)
@@ -118,6 +153,7 @@ def delete_usuario(id_usuario):
 
 # --- CRUD PontoColeta ---
 @routes.route('/pontos', methods=['GET'])
+@login_required
 def get_pontos():
     pontos = PontoColeta.query.all()
     return jsonify([{
@@ -131,6 +167,7 @@ def get_pontos():
     } for p in pontos])
 
 @routes.route('/pontos/<int:id_ponto>', methods=['GET'])
+@login_required
 def get_ponto(id_ponto):
     p = PontoColeta.query.get_or_404(id_ponto)
     return jsonify({
@@ -144,6 +181,7 @@ def get_ponto(id_ponto):
     })
 
 @routes.route('/pontos', methods=['POST'])
+@admin_required
 def create_ponto():
     data = request.get_json()
     p = PontoColeta(
@@ -167,6 +205,7 @@ def create_ponto():
     }), 201
 
 @routes.route('/pontos/<int:id_ponto>', methods=['PUT'])
+@admin_required
 def update_ponto(id_ponto):
     p = PontoColeta.query.get_or_404(id_ponto)
     data = request.get_json()
@@ -188,6 +227,7 @@ def update_ponto(id_ponto):
     })
 
 @routes.route('/pontos/<int:id_ponto>', methods=['DELETE'])
+@admin_required
 def delete_ponto(id_ponto):
     p = PontoColeta.query.get_or_404(id_ponto)
     db.session.delete(p)
@@ -196,6 +236,7 @@ def delete_ponto(id_ponto):
 
 # --- CRUD Conexao ---
 @routes.route('/conexoes', methods=['GET'])
+@login_required
 def get_conexoes():
     conexoes = Conexao.query.all()
     return jsonify([{
@@ -206,6 +247,7 @@ def get_conexoes():
     } for c in conexoes])
 
 @routes.route('/conexoes/<int:id_conexao>', methods=['GET'])
+@login_required
 def get_conexao(id_conexao):
     c = Conexao.query.get_or_404(id_conexao)
     return jsonify({
@@ -216,6 +258,7 @@ def get_conexao(id_conexao):
     })
 
 @routes.route('/conexoes', methods=['POST'])
+@admin_required
 def create_conexao():
     data = request.get_json()
     c = Conexao(
@@ -233,6 +276,7 @@ def create_conexao():
     }), 201
 
 @routes.route('/conexoes/<int:id_conexao>', methods=['PUT'])
+@admin_required
 def update_conexao(id_conexao):
     c = Conexao.query.get_or_404(id_conexao)
     data = request.get_json()
@@ -248,6 +292,7 @@ def update_conexao(id_conexao):
     })
 
 @routes.route('/conexoes/<int:id_conexao>', methods=['DELETE'])
+@admin_required
 def delete_conexao(id_conexao):
     c = Conexao.query.get_or_404(id_conexao)
     db.session.delete(c)
