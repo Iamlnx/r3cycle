@@ -21,7 +21,7 @@ baseURL: 'https://r3cycle.onrender.com'
 ```
 Para desenvolvimento local, altere para:
 ```js
-baseURL: 'http://localhost:5000'
+baseURL: 'http://localhost:3000'
 ```
 
 ## Execução
