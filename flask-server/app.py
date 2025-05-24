@@ -2,20 +2,25 @@
 from flask import Flask
 from flask_cors import CORS
 from dotenv import load_dotenv
-load_dotenv()
 from config import Config
-from models import db
-from routes_crud import routes  # Blueprint CRUD
+from extensions import db, bcrypt  
+from routes_crud import routes
 from routes_rota import rota_routes
 from routes_grafo import grafo_routes
+from routes_auth import auth_routes
+
+load_dotenv()
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
 db.init_app(app)
+bcrypt.init_app(app)
 CORS(app)
 app.register_blueprint(routes)
-app.register_blueprint(rota_routes)  
+app.register_blueprint(rota_routes)
 app.register_blueprint(grafo_routes)
+app.register_blueprint(auth_routes)
 
 if __name__ == "__main__":
     with app.app_context():
