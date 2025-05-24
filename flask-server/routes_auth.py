@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, session
-from models import db, Usuario
-from app import bcrypt  # importa o bcrypt já inicializado
+from models import Usuario
+from extensions import db, bcrypt
 
 auth_routes = Blueprint("auth_routes", __name__)
 

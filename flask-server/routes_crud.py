@@ -93,24 +93,6 @@ def get_usuario(id_usuario):
         'tipo_usuario': u.tipo_usuario
     })
 
-@routes.route('/usuarios', methods=['POST'])
-def create_usuario():
-    data = request.get_json()
-    u = Usuario(
-        nome=data['nome'],
-        email=data['email'],
-        senha=data['senha'],
-        tipo_usuario=data.get('tipo_usuario')
-    )
-    db.session.add(u)
-    db.session.commit()
-    return jsonify({
-        'id_usuario': u.id_usuario,
-        'nome': u.nome,
-        'email': u.email,
-        'tipo_usuario': u.tipo_usuario
-    }), 201
-
 @routes.route('/usuarios/<int:id_usuario>', methods=['PUT'])
 def update_usuario(id_usuario):
     u = Usuario.query.get_or_404(id_usuario)
