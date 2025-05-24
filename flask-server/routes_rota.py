@@ -2,13 +2,21 @@ from flask import Blueprint, request, jsonify
 from models import db
 from graphs import gerar_grafo_por_cidade, marcar_edges_com_classe
 from dijkstra import dijkstra
-from dfs import dfs_visit_all, calcular_custo_rota
+from tsp import tsp
 
 rota_routes = Blueprint('rota_routes', __name__)
 
 def get_edges_from_path(path):
     # Retorna lista de tuplas (origem, destino) para o caminho
     return [(path[i], path[i+1]) for i in range(len(path)-1)]
+
+def calcular_custo_rota(grafo, rota):
+    custo_total = 0
+    for i in range(len(rota) - 1):
+        origem = rota[i]
+        destino = rota[i+1]
+        custo_total += grafo[origem][destino]
+    return custo_total
 
 @rota_routes.route("/grafo_rota", methods=["POST"])
 def grafo_rota():
@@ -22,7 +30,6 @@ def grafo_rota():
     edges = grafo_cytoscape["edges"]
 
     # Monta grafo denso para TSP/Dijkstra
-    # grafo_denso: {nome: {vizinho: peso, ...}, ...}
     grafo_denso = {}
     for edge in edges:
         origem = edge["data"]["source"]
@@ -36,11 +43,12 @@ def grafo_rota():
         return jsonify({"erro": f"Ponto inicial '{inicio}' não encontrado na cidade"}), 400
 
     # Rota sequencial TSP (vizinho mais próximo)
-    rota_tsp = dfs_visit_all(grafo_denso, inicio)
+    rota_tsp = tsp(grafo_denso, inicio)
+    custo_tsp = calcular_custo_rota(grafo_denso, rota_tsp)
     ultimo_ponto_tsp = rota_tsp[-1]
 
     # Opcional: caminho de volta para fechar o ciclo, se desejar
-    menor_caminho, _ = dijkstra(grafo_denso, ultimo_ponto_tsp, inicio)
+    menor_caminho, custo_dijkstra = dijkstra(grafo_denso, ultimo_ponto_tsp, inicio)
 
     # Converte rotas para lista de edges (tuplas)
     edges_tsp = get_edges_from_path(rota_tsp)
@@ -55,6 +63,8 @@ def grafo_rota():
     return jsonify({
         "elements": elements,
         "tsp": rota_tsp,
-        "dijkstra": menor_caminho
+        "tsp_valor": custo_tsp,
+        "dijkstra": menor_caminho,
+        "dijkstra_valor": custo_dijkstra
     })
 
