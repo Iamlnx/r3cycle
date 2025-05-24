@@ -15,7 +15,7 @@ app.config.from_object(Config)
 
 db.init_app(app)
 bcrypt.init_app(app)
-CORS(app, supports_credentials=True, origins=["https://localhost:5173", "https://r3cycle-portal.onrender.com"])
+CORS(app, supports_credentials=True, origins=["http://localhost:5173", "https://r3cycle-portal.onrender.com"])
 app.register_blueprint(routes)
 app.register_blueprint(rota_routes)
 app.register_blueprint(grafo_routes)
