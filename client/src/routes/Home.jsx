@@ -3,6 +3,7 @@ import NavBar from '../components/NavBar';
 import GraphView from '../components/GraphView';
 import api from '../services/api';
 
+// Função para marcar arestas da rota (aceita ambas as direções)
 function marcarArestasDaRota(elements, rota, classe) {
   if (!rota || rota.length < 2) return elements;
   const newElements = elements.map(el => ({ ...el }));
@@ -12,14 +13,38 @@ function marcarArestasDaRota(elements, rota, classe) {
     for (const el of newElements) {
       if (
         el.data &&
-        el.data.source === source &&
-        el.data.target === target
+        (
+          (el.data.source === source && el.data.target === target) ||
+          (el.data.source === target && el.data.target === source)
+        )
       ) {
         el.classes = classe;
       }
     }
   }
   return newElements;
+}
+
+// Função para extrair subgrafo (apenas nós/arestas da rota)
+function extrairSubgrafo(elements, rota) {
+  if (!rota || rota.length < 2) return [];
+  // IDs dos nós na rota
+  const nodeIds = new Set(rota);
+  // Pares de nós que formam as arestas da rota
+  const edgeSet = new Set();
+  for (let i = 0; i < rota.length - 1; i++) {
+    edgeSet.add(`${rota[i]}-${rota[i + 1]}`);
+    edgeSet.add(`${rota[i + 1]}-${rota[i]}`); // caso não-direcional
+  }
+  // Filtra os nós presentes na rota
+  const nodes = elements.filter(el => el.data?.id && nodeIds.has(el.data.id));
+  // Filtra as arestas presentes no caminho da rota
+  const edges = elements.filter(el =>
+    el.data?.source && el.data?.target &&
+    (edgeSet.has(`${el.data.source}-${el.data.target}`) ||
+     edgeSet.has(`${el.data.target}-${el.data.source}`))
+  );
+  return [...nodes, ...edges];
 }
 
 function Home() {
@@ -29,6 +54,7 @@ function Home() {
   const [rotaDijkstra, setRotaDijkstra] = useState([]);
   const [elementsTsp, setElementsTsp] = useState([]);
   const [elementsDijkstra, setElementsDijkstra] = useState([]);
+  const [elementsGeral, setElementsGeral] = useState([]);
   const [loadingGrafos, setLoadingGrafos] = useState(false);
 
   useEffect(() => {
@@ -53,16 +79,23 @@ function Home() {
         const tsp = response.data.tsp;
         const dijkstra = response.data.dijkstra;
 
-        const elementsTsp = marcarArestasDaRota(allElements, tsp, "tsp");
-        const elementsDijkstra = marcarArestasDaRota(allElements, dijkstra, "dijkstra");
+        // Grafo geral: todos os elementos (sem marcação)
+        setElementsGeral(allElements);
 
+        // Grafo TSP: marca arestas do TSP
+        const elementsTsp = marcarArestasDaRota(allElements, tsp, "tsp");
         setElementsTsp(elementsTsp);
+
+        // Grafo Dijkstra: marca arestas do Dijkstra
+        const elementsDijkstra = marcarArestasDaRota(allElements, dijkstra, "dijkstra");
         setElementsDijkstra(elementsDijkstra);
+
         setRotaTsp(tsp);
         setRotaDijkstra(dijkstra);
       } catch (e) {
         setElementsTsp([]);
         setElementsDijkstra([]);
+        setElementsGeral([]);
         setRotaTsp([]);
         setRotaDijkstra([]);
       } finally {
@@ -100,24 +133,27 @@ function Home() {
               Cidade de {cidades.find(c => c.id_cidade === idCidadeSelecionada)?.nome}
             </h2>
             <div className="flex flex-col gap-8">
+              {/* Grafo Geral */}
+              <div>
+                <h3 className="font-semibold text-md mb-1">Mapa Geral</h3>
+                <div className='w-full h-[60vh] md:h-[85vh] border rounded bg-white shadow'>
+                  <GraphView elements={elementsGeral} />
+                </div>
+              </div>
               {/* Grafo TSP */}
               <div>
-                <h3 className="font-semibold text-md mb-1 text-[#386641]">Rota de Coleta</h3>
-                <div className="mb-2 text-gray-800 text-sm">
-                  {rotaComoTexto(rotaTsp)}
-                </div>
+                <h3 className="font-semibold text-md mb-1 text-[#386641]">Rota de Coleta (TSP)</h3>
+                <div className="mb-2 text-gray-800 text-sm">{rotaComoTexto(rotaTsp)}</div>
                 <div className='w-full h-[60vh] md:h-[85vh] border rounded bg-white shadow'>
-                  <GraphView elements={elementsTsp} />
+                  <GraphView elements={extrairSubgrafo(elementsTsp, rotaTsp)} />
                 </div>
               </div>
               {/* Grafo Dijkstra */}
               <div>
-                <h3 className="font-semibold text-md mb-1 text-blue-700">Rota de retorno à Central</h3>
-                <div className="mb-2 text-gray-800 text-sm">
-                  {rotaComoTexto(rotaDijkstra)}
-                </div>
+                <h3 className="font-semibold text-md mb-1 text-blue-700">Rota de Retorno (Dijkstra)</h3>
+                <div className="mb-2 text-gray-800 text-sm">{rotaComoTexto(rotaDijkstra)}</div>
                 <div className='w-full h-[60vh] md:h-[85vh] border rounded bg-white shadow'>
-                  <GraphView elements={elementsDijkstra} />
+                  <GraphView elements={extrairSubgrafo(elementsDijkstra, rotaDijkstra)} />
                 </div>
               </div>
             </div>
