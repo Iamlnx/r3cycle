@@ -18,9 +18,8 @@ function Login() {
     setErro('');
     setLoading(true);
     try {
-      await api.post('/login', { email, senha }, { withCredentials: true });
-      const status = await api.get('/status');
-      login(status.data.usuario);
+      const resp = await api.post('/login', { email, senha });
+      login(resp.data.usuario); // Já usa o usuário retornado do backend
       navigate('/');
     } catch (err) {
       setErro(err.response?.data?.erro || 'Erro ao fazer login');
