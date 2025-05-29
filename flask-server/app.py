@@ -20,6 +20,7 @@ app.register_blueprint(routes)
 app.register_blueprint(rota_routes)
 app.register_blueprint(grafo_routes)
 app.register_blueprint(auth_routes)
+print("SECRET_KEY:", app.config['SECRET_KEY'])
 
 if __name__ == "__main__":
     with app.app_context():
