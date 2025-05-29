@@ -27,16 +27,20 @@ def login():
     email = data.get('email')
     senha = data.get('senha')
     usuario = Usuario.query.filter_by(email=email).first()
-    print("Usuário:", usuario)
-    print("Senha enviada:", senha)
-    print("Hash armazenado:", usuario.senha if usuario else None)
-    print("Senha confere:", bcrypt.check_password_hash(usuario.senha, senha) if usuario else None)
     if usuario and bcrypt.check_password_hash(usuario.senha, senha):
         session['usuario_id'] = usuario.id_usuario
         session['usuario_nome'] = usuario.nome
         session['usuario_email'] = usuario.email
         session['tipo_usuario'] = usuario.tipo_usuario
-        return jsonify({'mensagem': 'Login realizado com sucesso'})
+        return jsonify({
+            'mensagem': 'Login realizado com sucesso',
+            'usuario': {
+                'id': usuario.id_usuario,
+                'nome': usuario.nome,
+                'email': usuario.email,
+                'tipo_usuario': usuario.tipo_usuario
+            }
+        })
     return jsonify({'erro': 'Email ou senha inválidos'}), 401
 
 @auth_routes.route('/logout', methods=['POST'])
