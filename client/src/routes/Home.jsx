@@ -47,6 +47,15 @@ function extrairSubgrafo(elements, rota) {
   return [...nodes, ...edges];
 }
 
+// Função para limpar classes das linhas
+function limparClassesDasArestas(elements) {
+  return elements.map(el =>
+    el.data?.source && el.data?.target
+      ? { ...el, classes: undefined }
+      : el
+  );
+}
+
 function Home() {
   const [cidades, setCidades] = useState([]);
   const [idCidadeSelecionada, setIdCidadeSelecionada] = useState(null);
@@ -80,7 +89,7 @@ function Home() {
         const dijkstra = response.data.dijkstra;
 
         // Grafo geral: todos os elementos (sem marcação)
-        setElementsGeral(allElements);
+        setElementsGeral(limparClassesDasArestas(allElements));
 
         // Grafo TSP: marca arestas do TSP
         const elementsTsp = marcarArestasDaRota(allElements, tsp, "tsp");
